@@ -76,7 +76,7 @@ export default function App() {
 
     try {
       const res = await fetchFeed(page, lang);
-      const data = res.data?.data || [];
+      const data = Array.isArray(res.data?.data) ? res.data.data : [];
 
       setNews((prev) => {
         const ids = new Set(prev.map((n) => n.id));
