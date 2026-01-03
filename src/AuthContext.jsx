@@ -1,13 +1,15 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext(undefined);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔁 Restore auth safely
+  /* =========================
+     🔁 RESTORE AUTH ON LOAD
+  ========================= */
   useEffect(() => {
     try {
       const storedToken = localStorage.getItem("token");
@@ -18,13 +20,18 @@ export function AuthProvider({ children }) {
         setUser(JSON.parse(storedUser));
       }
     } catch (err) {
-      console.error("Auth restore failed", err);
-      localStorage.clear();
+      console.error("❌ Auth restore failed", err);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
-  // ✅ LOGIN (token FIRST, user SECOND)
+  /* =========================
+     ✅ LOGIN
+     (token FIRST, user SECOND)
+  ========================= */
   const login = (token, user) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
@@ -32,7 +39,9 @@ export function AuthProvider({ children }) {
     setUser(user);
   };
 
-  // 🚪 LOGOUT
+  /* =========================
+     🚪 LOGOUT
+  ========================= */
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -45,7 +54,7 @@ export function AuthProvider({ children }) {
       value={{
         user,
         token,
-        isAuthenticated: !!token,
+        isAuthenticated: Boolean(token),
         login,
         logout,
         loading,
@@ -56,6 +65,13 @@ export function AuthProvider({ children }) {
   );
 }
 
+/* =========================
+   🔒 SAFE HOOK
+========================= */
 export function useAuth() {
-  return useContext(AuthContext);
+  const ctx = useContext(AuthContext);
+  if (ctx === undefined) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+  return ctx;
 }

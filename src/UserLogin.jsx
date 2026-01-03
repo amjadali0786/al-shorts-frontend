@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "./api";              // ✅ SAME API INSTANCE
 import { useAuth } from "./AuthContext";
 
 function UserLogin() {
@@ -24,18 +24,19 @@ function UserLogin() {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/auth/login",
-        { email, password },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      // ✅ NO localhost, NO axios direct
+      const res = await API.post("/auth/login", {
+        email,
+        password,
+      });
 
+      // ✅ SAME CONTRACT AS BACKEND
       login(res.data.token, res.data.user);
       navigate("/");
     } catch (err) {
       console.error("Login error:", err);
 
-      // ✅ SAFE ERROR HANDLING
+      // ✅ SAFE + FASTAPI FRIENDLY ERROR HANDLING
       if (Array.isArray(err.response?.data?.detail)) {
         setError(err.response.data.detail[0]?.msg || "Invalid input");
       } else if (typeof err.response?.data?.detail === "string") {
@@ -53,6 +54,7 @@ function UserLogin() {
       <h2>🔐 Login</h2>
 
       <input
+        type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -76,6 +78,9 @@ function UserLogin() {
   );
 }
 
+/* =========================
+   STYLES
+========================= */
 const boxStyle = {
   maxWidth: 400,
   margin: "120px auto",
@@ -89,6 +94,8 @@ const inputStyle = {
   width: "100%",
   padding: 10,
   marginBottom: 10,
+  borderRadius: 6,
+  border: "1px solid #ccc",
 };
 
 const btnStyle = {
@@ -98,6 +105,7 @@ const btnStyle = {
   border: "none",
   background: "#111",
   color: "#fff",
+  cursor: "pointer",
 };
 
 export default UserLogin;
