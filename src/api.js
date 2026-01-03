@@ -9,11 +9,9 @@ const API = axios.create({
 
 /* =========================
    🔐 JWT AUTO ATTACH
-   (SINGLE SOURCE OF TRUTH)
 ========================= */
 API.interceptors.request.use(
   (config) => {
-    // ✅ SAME KEY AS AuthContext
     const token = localStorage.getItem("token");
 
     if (token) {
@@ -27,7 +25,6 @@ API.interceptors.request.use(
 
 /* =========================
    📰 FEED API
-   (GUEST + LOGGED-IN BOTH)
 ========================= */
 export const fetchFeed = (page = 1, language = "hi") => {
   return API.get("/feed", {
@@ -39,8 +36,9 @@ export const fetchFeed = (page = 1, language = "hi") => {
   });
 };
 
-export default API;
-// ⭐ BOOKMARK API
+/* =========================
+   ⭐ BOOKMARK APIs
+========================= */
 export const toggleBookmarkAPI = (newsId) => {
   return API.post(`/bookmarks/${newsId}`);
 };
@@ -48,3 +46,5 @@ export const toggleBookmarkAPI = (newsId) => {
 export const fetchBookmarks = () => {
   return API.get("/bookmarks");
 };
+
+export default API;
