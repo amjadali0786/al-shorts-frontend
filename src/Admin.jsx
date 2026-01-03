@@ -234,7 +234,7 @@ function Admin() {
               }}>
                 {n.image_url && (
                   <img
-                    src={`http://127.0.0.1:8000${n.image_url}?t=${Date.now()}`}
+                    src={`https://al-shorts-backend.onrender.com${n.image_url}?t=${Date.now()}`}
                     style={{
                       width: "100%",
                       height: 200,
