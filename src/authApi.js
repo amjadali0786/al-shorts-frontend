@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const AUTH_API = axios.create({
-  baseURL: "https://al-shorts-backend.onrender.com",
+  baseURL: "http://127.0.0.1:8000",
 });
 
 export const signupUser = (data) => {

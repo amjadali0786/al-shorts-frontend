@@ -3,7 +3,6 @@ import API, {
   fetchAdminOverview,
   fetchAdminNewsAnalytics
 } from "./adminApi";
-import axios from "axios";
 import AdminLogin from "./AdminLogin";
 
 /* =========================
@@ -35,8 +34,8 @@ function Admin() {
   /* AUTH */
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("adminAuth"));
 
-  /* LANGUAGE TOGGLE */
-  const [lang, setLang] = useState("hi"); // hi | en
+  /* LANGUAGE */
+  const [lang, setLang] = useState("hi");
 
   /* ANALYTICS */
   const [overview, setOverview] = useState(null);
@@ -56,7 +55,9 @@ function Admin() {
   const [editTitle, setEditTitle] = useState("");
   const [editSummary, setEditSummary] = useState("");
 
-  /* FETCH NEWS */
+  /* =========================
+     FETCH NEWS
+  ========================= */
   const fetchNews = async () => {
     const params = {};
     if (statusFilter !== "all") params.status = statusFilter;
@@ -71,9 +72,14 @@ function Admin() {
     fetchAdminNewsAnalytics().then(r => setNewsAnalytics(r.data));
   }, [loggedIn, statusFilter]);
 
-  /* AI UPLOAD */
+  /* =========================
+     AI UPLOAD (FIXED)
+  ========================= */
   const submitContent = async () => {
-    if (!uploadFile && !uploadText.trim()) return alert("Upload or paste text");
+    if (!uploadFile && !uploadText.trim()) {
+      alert("Upload file or paste text");
+      return;
+    }
 
     setUploading(true);
     try {
@@ -81,7 +87,11 @@ function Admin() {
       if (uploadFile) fd.append("file", uploadFile);
       else fd.append("file", new Blob([uploadText]), "content.txt");
 
-      await axios.post("http://127.0.0.1:8000/upload/", fd);
+      // ✅ SAME API INSTANCE (NO LOCALHOST)
+      await API.post("/upload/", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       setUploadFile(null);
       setUploadText("");
       fetchNews();
@@ -90,12 +100,16 @@ function Admin() {
     }
   };
 
-  /* ACTIONS */
+  /* =========================
+     ACTIONS
+  ========================= */
   const uploadImage = async (id, file) => {
     if (!file) return;
     const fd = new FormData();
     fd.append("file", file);
-    await API.post(`/admin/upload-image/${id}`, fd);
+    await API.post(`/admin/upload-image/${id}`, fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     fetchNews();
   };
 
@@ -147,7 +161,6 @@ function Admin() {
         <h2>🛠 Admin Dashboard</h2>
 
         <div style={{ display: "flex", gap: 12 }}>
-          {/* LANG TOGGLE */}
           <button
             onClick={() => setLang(l => l === "hi" ? "en" : "hi")}
             style={btn("#2563eb")}
@@ -234,7 +247,7 @@ function Admin() {
               }}>
                 {n.image_url && (
                   <img
-                    src={`https://al-shorts-backend.onrender.com${n.image_url}?t=${Date.now()}`}
+                    src={`${import.meta.env.VITE_API_BASE_URL}${n.image_url}?t=${Date.now()}`}
                     style={{
                       width: "100%",
                       height: 200,

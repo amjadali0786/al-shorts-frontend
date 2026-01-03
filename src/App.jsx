@@ -213,7 +213,8 @@ export default function App() {
           return (
             <div key={item.id} onClick={() => handleTap(item)} style={{ height: "100vh", background: dark ? "#000" : "#fff", display: "flex", flexDirection: "column", position: "relative" }}>
               {showHeart && <div className="heart">❤️</div>}
-              {item.image_url && <img loading="lazy" src={`https://al-shorts-backend.onrender.com${item.image_url}`} style={{ height: "55vh", width: "100%", objectFit: "cover" }} />}
+              {item.image_url && <img loading="lazy" src={`${import.meta.env.VITE_API_BASE_URL}${item.image_url}`}
+ style={{ height: "55vh", width: "100%", objectFit: "cover" }} />}
               <div style={{ padding: 18 }}>
                 <h2>{lang === "hi" ? item.title_hi : item.title_en}</h2>
                 <p style={{ lineHeight: 1.6, opacity: 0.9 }}>{lang === "hi" ? item.summary_hi : item.summary_en}</p>
