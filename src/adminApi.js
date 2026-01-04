@@ -7,7 +7,6 @@ const ADMIN_API = axios.create({
   },
 });
 
-// admin auth token
 ADMIN_API.interceptors.request.use((config) => {
   const token = localStorage.getItem("adminAuth");
   if (token) {
