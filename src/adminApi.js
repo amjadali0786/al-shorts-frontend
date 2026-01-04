@@ -1,25 +1,25 @@
 import axios from "axios";
 
-const API = axios.create({
+const ADMIN_API = axios.create({
   baseURL: "https://al-shorts-backend.onrender.com",
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-API.interceptors.request.use((config) => {
-  const auth = JSON.parse(localStorage.getItem("adminAuth") || "{}");
-
-  if (auth.username && auth.password) {
-    config.auth = {
-      username: auth.username,
-      password: auth.password,
-    };
+// admin auth token
+ADMIN_API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("adminAuth");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
 
-export default API;
 export const fetchAdminOverview = () =>
-  API.get("/admin/analytics/overview");
+  ADMIN_API.get("/admin/analytics/overview");
 
 export const fetchAdminNewsAnalytics = () =>
-  API.get("/admin/analytics/news");
+  ADMIN_API.get("/admin/analytics/news");
+
+export default ADMIN_API;

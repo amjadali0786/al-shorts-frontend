@@ -69,7 +69,7 @@ export default function App() {
   /* =========================
      DATA
   ========================= */
-  const loadNews = async () => {
+ const loadNews = async () => {
   if (loadingRef.current || !hasMore) return;
   loadingRef.current = true;
   setLoading(true);
@@ -77,28 +77,25 @@ export default function App() {
   try {
     const res = await fetchFeed(page, lang);
 
-    const data = Array.isArray(res?.data?.data)
-      ? res.data.data
-      : [];
+    // ✅ SAFE GUARD
+    const data = Array.isArray(res?.data?.data) ? res.data.data : [];
 
     setNews((prev) => {
       const ids = new Set(prev.map((n) => n.id));
       return [...prev, ...data.filter((n) => !ids.has(n.id))];
     });
 
-    if (data.length === 0) {
-      setHasMore(false);
-    } else {
-      setPage((p) => p + 1);
-    }
-  } catch (err) {
-    console.error("❌ Feed load failed:", err);
+    if (data.length === 0) setHasMore(false);
+    else setPage((p) => p + 1);
+  } catch (e) {
+    console.error("Feed load failed", e);
     setHasMore(false);
   } finally {
     loadingRef.current = false;
     setLoading(false);
   }
 };
+
 
   useEffect(() => {
     setNews([]);
